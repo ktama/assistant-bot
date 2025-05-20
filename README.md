@@ -29,6 +29,13 @@
    # config.ini をエディタで開き、設定を変更します。
    ```
 
+4. ffmpegをインストール
+
+   ```powershell
+   winget install --id=Gyan.FFmpeg -e
+   ffmpeg -version
+   ```
+
 ## 使用方法
 
 ボットを起動するには、以下のコマンドを実行します。

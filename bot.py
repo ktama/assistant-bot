@@ -66,22 +66,6 @@ async def ask(interaction: discord.Interaction, question: str):
 
     await interaction.followup.send(reply)
 
-@tree.command(name="sq", description="質問する")
-async def ask(interaction: discord.Interaction, question: str):
-    await interaction.response.defer(thinking=True)
-
-    # 履歴取得
-    history_msgs = await interaction.channel.history(limit=10).flatten()
-    history_msgs = list(reversed(history_msgs))
-
-    try:
-        response = model.generate_content(prompt+question)
-        reply = response.text
-    except Exception as e:
-        reply = f"エラーが発生しました: {e}"
-
-    await interaction.followup.send(reply)
-
 # ボイスチャンネル参加コマンド
 @tree.command(name="voice", description="ボイスチャンネルに参加")
 async def join_vc(interaction: discord.Interaction):
@@ -137,18 +121,16 @@ async def read_aloud(text):
             with open("output.wav", "wb") as f:
                 f.write(await resp.read())
 
-    # 再生
-    audio = AudioSegment.from_wav("output.wav")
-    audio.export("output.mp3", format="mp3")
-
-    # 再生中は他を待たせる
-    source = discord.FFmpegPCMAudio("output.mp3")
+    # 再生（mp3は使わず、wavを直接再生）
+    source = discord.FFmpegPCMAudio("output.wav")
     vc_client.play(source)
+
+    # 再生中は待機
     while vc_client.is_playing():
         await asyncio.sleep(0.5)
 
+    # 後片付け
     os.remove("output.wav")
-    os.remove("output.mp3")
 
 if __name__ == "__main__":
     prompt = load_prompt_template()
